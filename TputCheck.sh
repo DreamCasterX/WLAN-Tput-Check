@@ -53,7 +53,7 @@ Update_script() {
     release_url=https://api.github.com/repos/DreamCasterX/WLAN-Tput-Check/releases/latest
     new_version=$(curl -s "${release_url}" | grep '"tag_name":' | awk -F\" '{print $4}')
     release_note=$(curl -s "${release_url}" | grep '"body":' | awk -F\" '{print $4}')
-    tarball_url="https://github.com/DreamCasterX/OpenAMT-mps-setup/archive/refs/tags/${new_version}.tar.gz"
+    tarball_url="https://github.com/DreamCasterX/WLAN-Tput-Check/archive/refs/tags/${new_version}.tar.gz"
     if [[ $new_version != $__version__ ]]; then
         echo -e "⭐️ New version found!\n\nVersion: $new_version\nRelease note:\n$release_note"
         sleep 2
