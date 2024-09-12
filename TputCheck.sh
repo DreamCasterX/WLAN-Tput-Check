@@ -16,7 +16,6 @@ __version__="1.0"
 
 
 # RHEL 9 packages 
-# iperf_9="iperf3-3.9-13.el9.x86_64.rpm"                     # 3.9-10 (RHEL 9.4 GA)
 iperf_9="iperf3-3.9-11.el9.x86_64.rpm"                     # 3.9-10 (RHEL 9.4 GA)
 lksctp_9="lksctp-tools-1.0.19-2.el9.x86_64.rpm"            # 1.0.19-3 (RHEL 9.4 GA)
 libgcc_9="libgcc-11.5.0-2.el9.x86_64.rpm"                  # 11.4.1-3 (RHEL 9.4 GA)
@@ -51,15 +50,15 @@ CheckNetwork() {
 # Check the update and download binaries
 Update_script() {
     release_url=https://api.github.com/repos/DreamCasterX/WLAN-Tput-Check/releases/latest
-    new_version=$(curl -s "${release_url}" | grep '"tag_name":' | awk -F\" '{print $4}')
-    release_note=$(curl -s "${release_url}" | grep '"body":' | awk -F\" '{print $4}')
+    new_version=$(wget -qO- "${release_url}" | grep '"tag_name":' | awk -F\" '{print $4}')
+    release_note=$(wget -qO- "${release_url}" | grep '"body":' | awk -F\" '{print $4}')
     tarball_url="https://github.com/DreamCasterX/WLAN-Tput-Check/archive/refs/tags/${new_version}.tar.gz"
     if [[ $new_version != $__version__ ]]; then
         echo -e "⭐️ New version found!\n\nVersion: $new_version\nRelease note:\n$release_note"
         sleep 2
         echo -e "\nDownloading update..."
         pushd "$PWD" > /dev/null 2>&1
-        curl --silent --insecure --fail --retry-connrefused --retry 3 --retry-delay 2 --location --output ".WLAN-Tput-Check.tar.gz" "${tarball_url}"
+        wget --quiet --no-check-certificate --tries=3 --waitretry=2 --output-document=".WLAN-Tput-Check.tar.gz" "${tarball_url}"
         if [[ -e ".WLAN-Tput-Check.tar.gz" ]]; then
 	    tar -xf .WLAN-Tput-Check.tar.gz -C "$PWD" --strip-components 1 > /dev/null 2>&1
 	    rm -f .WLAN-Tput-Check.tar.gz
@@ -107,7 +106,7 @@ case $PKG in
         rpm_link_AppStream="https://rpmfind.net/linux/centos-stream/$OS_VERSION-stream/AppStream/x86_64/os/Packages/"
         if [[ $OS_VERSION == '9' ]]; then 
             CheckNetwork
-            wget -P ./rhcert/rpm_9/ $rpm_link_AppStream$iperf_9 $rpm_link_BaseOS$lksctp_9 $rpm_link_BaseOS$libgcc_9 $rpm_link_BaseOS$glibc_9 $rpm_link_BaseOS$glibccom_9 $rpm_link_BaseOS$glibclang_9 $rpm_link_BaseOS$openssl_9 $rpm_link_BaseOS$zlib_9
+            wget -P ./rhcert/rpm_9/ $rpm_link_AppStream$iperf_9 $rpm_link_BaseOS$lksctp_9 # $rpm_link_BaseOS$libgcc_9 $rpm_link_BaseOS$glibc_9 $rpm_link_BaseOS$glibccom_9 $rpm_link_BaseOS$glibclang_9 $rpm_link_BaseOS$openssl_9 $rpm_link_BaseOS$zlib_9
 	    sudo rpm -ivh ./rhcert/rpm_9/*.rpm 
         elif [[ $OS_VERSION == '10' ]]; then 
             CheckNetwork
@@ -118,16 +117,6 @@ case $PKG in
     ;;
 esac   
    
-
-## Local install (RHEL only)
-# if [[ ! -f /usr/bin/iperf3 ]]; then
-#     if [[ $OS_VERSION == '9' ]]; then 
-#         CheckNetwork && sudo rpm -ivh ./rhcert/rpm_9/*.rpm || :
-#     elif [[ $OS_VERSION == '10' ]]; then 
-#         CheckNetwork && sudo rpm -ivh ./rhcert/rpm_10/*.rpm || :
-#     fi
-# fi
-
 
 # Get partner client's IP
 [[ ! -f ./SUT_ip.txt ]] && read -p "Input partner client's IP: " SUT_IP && echo $SUT_IP > SUT_ip.txt || SUT_IP=`cat ./SUT_ip.txt`
