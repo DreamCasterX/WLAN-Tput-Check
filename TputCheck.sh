@@ -51,7 +51,10 @@ CheckNetwork() {
 [[ -f /usr/bin/apt ]] && PKG=apt || PKG=dnf
 case $PKG in
 "apt")
-    [[ ! -f /usr/bin/iperf3 ]] && CheckNetwork && sudo apt update && sudo apt install ssh iperf3 -y || : 
+    if [[ ! -f /usr/bin/iperf3 ]]; then 
+    CheckNetwork
+    sudo apt update && sudo apt install ssh iperf3 -y
+    fi
     ;;
 "dnf")
     if [[ ! -f /usr/bin/iperf3 ]]; then

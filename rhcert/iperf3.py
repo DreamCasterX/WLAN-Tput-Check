@@ -2,7 +2,7 @@ from command import Command, HwCertCommandException
 import re
 
 bw_output = Command("cat ./iperf3_output.txt").getStringList(regex=".*sender")
-pattern = re.compile(".*?(?P<speed>[\d\.]+)\s+Mbits/sec")
+pattern = re.compile(r".*?(?P<speed>[\d\.]+)\s+Mbits/sec")
 speed = 0.0
 
 for output in bw_output:
