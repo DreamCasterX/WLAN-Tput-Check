@@ -107,11 +107,11 @@ case $PKG in
         if [[ $OS_VERSION == '9' ]]; then 
             CheckNetwork
             wget -P ./rhcert/rpm_9/ $rpm_link_AppStream$iperf_9 $rpm_link_BaseOS$lksctp_9 # $rpm_link_BaseOS$libgcc_9 $rpm_link_BaseOS$glibc_9 $rpm_link_BaseOS$glibccom_9 $rpm_link_BaseOS$glibclang_9 $rpm_link_BaseOS$openssl_9 $rpm_link_BaseOS$zlib_9
-	    sudo rpm -ivh ./rhcert/rpm_9/*.rpm 
+	        sudo rpm -ivh ./rhcert/rpm_9/*.rpm --force && sudo rm -fr ./rhcert/rpm_9
         elif [[ $OS_VERSION == '10' ]]; then 
             CheckNetwork
             wget -P ./rhcert/rpm_10/ $rpm_link_AppStream$iperf_10 $rpm_link_BaseOS$lksctp_10
-	    sudo rpm -ivh ./rhcert/rpm_10/*.rpm && sudo rm -fr ./rhcert/rpm_10
+	        sudo rpm -ivh ./rhcert/rpm_10/*.rpm --force && sudo rm -fr ./rhcert/rpm_10
         fi
     fi
     ;;
