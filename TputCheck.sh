@@ -47,6 +47,50 @@ CheckNetwork() {
     ! nslookup "hp.com" > /dev/null && echo "❌ No Internet connection! Please check your network" && sleep 3 && exit
 }
 
+
+# Check the update and download binaries
+Update_script() {
+    release_url=https://api.github.com/repos/DreamCasterX/WLAN-Tput-Check/releases/latest
+    new_version=$(curl -s "${release_url}" | grep '"tag_name":' | awk -F\" '{print $4}')
+    release_note=$(curl -s "${release_url}" | grep '"body":' | awk -F\" '{print $4}')
+    tarball_url="https://github.com/DreamCasterX/OpenAMT-mps-setup/archive/refs/tags/${new_version}.tar.gz"
+    if [[ $new_version != $__version__ ]]; then
+        echo -e "⭐️ New version found!\n\nVersion: $new_version\nRelease note:\n$release_note"
+        sleep 2
+        echo -e "\nDownloading update..."
+        pushd "$PWD" > /dev/null 2>&1
+        curl --silent --insecure --fail --retry-connrefused --retry 3 --retry-delay 2 --location --output ".WLAN-Tput-Check.tar.gz" "${tarball_url}"
+        if [[ -e ".WLAN-Tput-Check.tar.gz" ]]; then
+	    tar -xf .WLAN-Tput-Check.tar.gz -C "$PWD" --strip-components 1 > /dev/null 2>&1
+	    rm -f .WLAN-Tput-Check.tar.gz
+            popd > /dev/null 2>&1
+            sleep 3
+            sudo chmod 755 TputCheck.sh
+            echo -e "Successfully updated! Please run TputCheck.sh again.\n\n" ; exit 1
+        else
+            echo -e "\n❌ Error occurred while downloading" ; exit 1
+        fi 
+    else
+        if [[ ! -d ./rhcert ]]; then
+            echo -e "\nDownloading test binaries....\n"
+            pushd "$PWD" > /dev/null 2>&1
+            wget --quiet --no-check-certificate --tries=3 --waitretry=2 --output-document=".WLAN-Tput-Check.tar.gz" "${tarball_url}"
+            if [[ -e ".WLAN-Tput-Check.tar.gz" ]]; then
+	        tar -xf .WLAN-Tput-Check.tar.gz -C "$PWD" --strip-components 1 WLAN-Tput-Check-$new_version/rhcert > /dev/null 2>&1
+                rm -f .WLAN-Tput-Check.tar.gz
+                popd > /dev/null 2>&1
+                sleep 3
+                sudo chmod 755 -R ./rhcert
+                echo -e "\e[32mDone!\e[0m"
+            else
+                echo -e "\n\e[31mDownload test binaries failed.\e[0m" ; exit 1
+            fi	
+        fi		
+    fi
+}
+Update_script
+
+
 # Remote install
 [[ -f /usr/bin/apt ]] && PKG=apt || PKG=dnf
 case $PKG in
@@ -85,7 +129,7 @@ esac
 # fi
 
 
-# Get parnter client's IP
+# Get partner client's IP
 [[ ! -f ./SUT_ip.txt ]] && read -p "Input partner client's IP: " SUT_IP && echo $SUT_IP > SUT_ip.txt || SUT_IP=`cat ./SUT_ip.txt`
 
 
