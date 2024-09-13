@@ -9,4 +9,7 @@ for output in bw_output:
 	sp = pattern.match(output).group("speed")
 	print("Bandwidth Output: '%s'\n Speed: %s Mb/sec" % (output, sp))
 	speed += float(sp)
-print(f"\n🚀 Speed = {speed} Mb/s\n\n")
+
+result = "\033[91m\033[1m(FAIL)" if int(speed) < 960 else "\033[96m\033[1m(PASS)"
+
+print(f"\n🚀 Speed = {speed} Mb/s {result}\n\n")
