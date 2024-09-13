@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # CREATOR: mike.lu@hp.com
-# CHANGE DATE: 2024/09/12
+# CHANGE DATE: 2024/09/13
 __version__="1.0"
 
 
@@ -46,9 +46,8 @@ CheckNetwork() {
     ! nslookup "hp.com" > /dev/null && echo "❌ No Internet connection! Please check your network" && sleep 3 && exit
 }
 
-
 # Check the update and download binaries
-Update_script() {
+UpdateScript() {
     release_url=https://api.github.com/repos/DreamCasterX/WLAN-Tput-Check/releases/latest
     new_version=$(wget -qO- "${release_url}" | grep '"tag_name":' | awk -F\" '{print $4}')
     release_note=$(wget -qO- "${release_url}" | grep '"body":' | awk -F\" '{print $4}')
@@ -87,16 +86,18 @@ Update_script() {
         fi		
     fi
 }
-Update_script
+
+CheckNetwork
+UpdateScript
 
 
 # Remote install
 [[ -f /usr/bin/apt ]] && PKG=apt || PKG=dnf
 case $PKG in
 "apt")
-    if [[ ! -f /usr/bin/iperf3 ]]; then 
-    CheckNetwork
-    sudo apt update && sudo apt install ssh iperf3 -y
+    if [[ ! -f /usr/bin/iperf3 ]]; then
+        CheckNetwork
+        sudo apt update && sudo apt install ssh iperf3 -y
     fi
     ;;
 "dnf")
@@ -107,11 +108,11 @@ case $PKG in
         if [[ $OS_VERSION == '9' ]]; then 
             CheckNetwork
             wget -P ./rhcert/rpm_9/ $rpm_link_AppStream$iperf_9 $rpm_link_BaseOS$lksctp_9 # $rpm_link_BaseOS$libgcc_9 $rpm_link_BaseOS$glibc_9 $rpm_link_BaseOS$glibccom_9 $rpm_link_BaseOS$glibclang_9 $rpm_link_BaseOS$openssl_9 $rpm_link_BaseOS$zlib_9
-	        sudo rpm -ivh ./rhcert/rpm_9/*.rpm --force && sudo rm -fr ./rhcert/rpm_9
+	    sudo rpm -ivh ./rhcert/rpm_9/*.rpm --force && sudo rm -fr ./rhcert/rpm_9
         elif [[ $OS_VERSION == '10' ]]; then 
             CheckNetwork
             wget -P ./rhcert/rpm_10/ $rpm_link_AppStream$iperf_10 $rpm_link_BaseOS$lksctp_10
-	        sudo rpm -ivh ./rhcert/rpm_10/*.rpm --force && sudo rm -fr ./rhcert/rpm_10
+	    sudo rpm -ivh ./rhcert/rpm_10/*.rpm --force && sudo rm -fr ./rhcert/rpm_10
         fi
     fi
     ;;
