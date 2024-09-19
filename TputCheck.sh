@@ -115,31 +115,43 @@ esac
    
 
 # Get partner client's IP
-[[ ! -f ./SUT_ip.txt ]] && read -p "Input partner client's IP (press Enter to use default: 192.168.1.3): " input
-[[ -z "$input" ]] && input="192.168.1.3"
-echo "$input" > SUT_ip.txt 
+if [[ ! -f ./SUT_ip.txt ]]; then 
+    read -p "Input partner client's IP (press Enter to use default: 192.168.1.3): " input 
+    if [[ -z "$input" ]]; then
+        echo "192.168.1.3" > SUT_ip.txt
+    else
+        echo "$input" > SUT_ip.txt 
+    fi
+fi
 SUT_IP=$(cat ./SUT_ip.txt)
 
 
 # Configure partner client's ports and firewall
-echo -e "\e[33mConfiguring partner client...\e[0m" 
-ssh -T $HOST_NAME@$SUT_IP << EOF
-    # Run iperf3 server on partner client ports
-    for port in \`seq 52001 52002\`; do iperf3 -s -D -p \$port; done
+Configure() {
+    ssh -T $HOST_NAME@$SUT_IP << EOF
+        # Run iperf3 server on partner client ports
+        for port in \`seq 52001 52002\`; do iperf3 -s -D -p \$port; done
 
-    # Stop firewall service based on OS
-    if [[ -f /usr/sbin/firewalld ]]; then
-        echo '$PASSWORD' | sudo -S systemctl stop firewalld.service
-    elif [[ -f /usr/sbin/ufw ]]; then
-        echo '$PASSWORD' | sudo -S systemctl stop ufw.service
-    fi
-    exit
+        # Stop firewall service based on OS
+        if [[ -f /usr/sbin/firewalld ]]; then
+            echo '$PASSWORD' | sudo -S systemctl stop firewalld.service
+        elif [[ -f /usr/sbin/ufw ]]; then
+            echo '$PASSWORD' | sudo -S systemctl stop ufw.service
+        fi
+        exit
 EOF
-if [[ $? -ne 0 ]]; then
-  echo -e "\n\e[31mFailed to configure partner client.\e[0m"
-  exit 1
-fi 
+    if [[ $? -ne 0 ]]; then
+      echo -e "\n\e[31mFailed to configure partner client.\e[0m"
+      exit 1
+    fi
+    export CONFIGURED=true
+} 
 
+if [[ -z "$CONFIGURED" ]]; then
+    echo -e "\e[33mConfiguring partner client...\e[0m" 
+    Configure
+fi
+    
 
 # Run iperf test
 echo -e "\n\e[33mStarting iperf test...\e[0m"
