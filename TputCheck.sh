@@ -81,7 +81,7 @@ UpdateScript() {
     fi
 }
 
-echo -e "[WiFi Throughput Check Utility]\n" 
+echo -e "\n[HP WiFi Throughput Test Utility]\n" 
 CheckNetwork
 UpdateScript
 
