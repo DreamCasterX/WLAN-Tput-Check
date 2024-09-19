@@ -10,25 +10,11 @@ HOST_NAME="u"
 PASSWORD="u"
 
 
-# RHEL 9 packages 
-iperf_9="iperf3-3.9-11.el9.x86_64.rpm"                     # 3.9-10 (RHEL 9.4 GA)
-lksctp_9="lksctp-tools-1.0.19-2.el9.x86_64.rpm"            # 1.0.19-3 (RHEL 9.4 GA)
-libgcc_9="libgcc-11.5.0-2.el9.x86_64.rpm"                  # 11.4.1-3 (RHEL 9.4 GA)
-glibc_9="glibc-2.34-122.el9.x86_64.rpm"                    # 2.34-100 (RHEL 9.4 GA)
-glibccom_9="glibc-common-2.34-122.el9.x86_64.rpm"          # 2.34-100 (RHEL 9.4 GA)
-glibclang_9="glibc-all-langpacks-2.34-122.el9.x86_64.rpm"  # 2.34-100 (RHEL 9.4 GA)
-openssl_9="openssl-libs-3.2.2-6.el9.x86_64.rpm"            # 3.0.7-27 (RHEL 9.4 GA)
-zlib_9="zlib-1.2.11-41.el9.i686.rpm"                       # 1.2.11-40 (RHEL 9.4 GA)
-
-# RHEL 10 packages 
+# RHEL packages 
+iperf_9="iperf3-3.9-11.el9.x86_64.rpm"            # 3.9-10 (RHEL 9.4 GA)
+lksctp_9="lksctp-tools-1.0.19-2.el9.x86_64.rpm"   # 1.0.19-3 (RHEL 9.4 GA)
 iperf_10="iperf3-3.17.1-2.el10.x86_64.rpm"
 lksctp_10="lksctp-tools-1.0.19-7.el10.x86_64.rpm"
-libgcc_10="libgcc-14.2.1-1.el10.x86_64.rpm"                # 14.2.1-1 (RHEL 10 nightly_0902)
-glibc_10="glibc-2.39-17.el10.x86_64.rpm"                   # 2.39-17 (RHEL 10 nightly_0902)
-glibccom_10="glibc-common-2.39-17.el10.x86_64.rpm"         # 2.39-17 (RHEL 10 nightly_0902)
-glibclang_10="glibc-all-langpacks-2.39-17.el10.x86_64.rpm" # 2.39-17 (RHEL 10 nightly_0902)
-openssl_10="openssl-libs-3.2.2-12.el10.x86_64.rpm"         # 3.2.2-11 (RHEL 10 nightly_0902)
-zlib_10="zlib-ng-compat-2.1.6-3.el10.x86_64.rpm"           # 2.1.6-3 (RHEL 10 nightly_08xx)
 
 
 # Restrict user account
@@ -81,7 +67,7 @@ UpdateScript() {
     fi
 }
 
-echo -e "\n[HP WiFi Throughput Test Utility]\n" 
+echo -e "\n[HP WiFi Throughtput Test Utility]\n" 
 CheckNetwork
 UpdateScript
 
@@ -102,7 +88,7 @@ case $PKG in
         rpm_link_AppStream="https://rpmfind.net/linux/centos-stream/$OS_VERSION-stream/AppStream/x86_64/os/Packages/"
         if [[ $OS_VERSION == '9' ]]; then 
             CheckNetwork
-            wget -P ./rhcert/rpm_9/ $rpm_link_AppStream$iperf_9 $rpm_link_BaseOS$lksctp_9 # $rpm_link_BaseOS$libgcc_9 $rpm_link_BaseOS$glibc_9 $rpm_link_BaseOS$glibccom_9 $rpm_link_BaseOS$glibclang_9 $rpm_link_BaseOS$openssl_9 $rpm_link_BaseOS$zlib_9
+            wget -P ./rhcert/rpm_9/ $rpm_link_AppStream$iperf_9 $rpm_link_BaseOS$lksctp_9 
 	    sudo rpm -ivh ./rhcert/rpm_9/*.rpm --force && sudo rm -fr ./rhcert/rpm_9
         elif [[ $OS_VERSION == '10' ]]; then 
             CheckNetwork
