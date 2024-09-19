@@ -130,6 +130,7 @@ SUT_IP=$(cat ./SUT_ip.txt)
 Configure() {
     ssh -T $HOST_NAME@$SUT_IP << EOF
         # Run iperf3 server on partner client ports
+        [[ ! -f /usr/bin/iperf3 ]] && echo -e "\n\e[31miperf3 tool is not installed on the partner client!\e[0m" && exit 1
         for port in \`seq 52001 52002\`; do iperf3 -s -D -p \$port; done
 
         # Stop firewall service based on OS
@@ -144,10 +145,10 @@ EOF
       echo -e "\n\e[31mFailed to configure partner client.\e[0m"
       exit 1
     fi
-    export CONFIGURED=true
+    touch .configured_$SUT_IP
 } 
 
-if [[ -z "$CONFIGURED" ]]; then
+if [[ ! -f .configured_$SUT_IP ]]; then
     echo -e "\e[33mConfiguring partner client...\e[0m" 
     Configure
 fi
