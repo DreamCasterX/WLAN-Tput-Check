@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 
 # CREATOR: mike.lu@hp.com
-# CHANGE DATE: 2024/09/13
-__version__="1.0"
+# CHANGE DATE: 2024/09/19
+__version__="1.1"
 
 
-# [WiFi Throughput Check Setup] 
-# 1. Make sure you can log in to the Partner Client via SSH 
-#	ssh <partner client’s user name>@<partner client’s IP>    e.g., ssh u@192.168.1.3
-#
-# 2. Run below command on Partner Client (one-time effort):
-#	`for port in `seq 52001 52002`; do iperf3 -s -D -p $port; done`
-#	(On RHEL):   `sudo systemctl stop firewalld.service`
-#	(On Ubuntu): `sudo systemctl stop ufw.service`
+# Define partner client info
+HOST_NAME="u"
+PASSWORD="u"
 
 
 # RHEL 9 packages 
@@ -24,7 +19,6 @@ glibccom_9="glibc-common-2.34-122.el9.x86_64.rpm"          # 2.34-100 (RHEL 9.4 
 glibclang_9="glibc-all-langpacks-2.34-122.el9.x86_64.rpm"  # 2.34-100 (RHEL 9.4 GA)
 openssl_9="openssl-libs-3.2.2-6.el9.x86_64.rpm"            # 3.0.7-27 (RHEL 9.4 GA)
 zlib_9="zlib-1.2.11-41.el9.i686.rpm"                       # 1.2.11-40 (RHEL 9.4 GA)
-
 
 # RHEL 10 packages 
 iperf_10="iperf3-3.17.1-2.el10.x86_64.rpm"
@@ -87,6 +81,7 @@ UpdateScript() {
     fi
 }
 
+echo -e "[WiFi Throughput Check Utility]\n" 
 CheckNetwork
 UpdateScript
 
@@ -120,10 +115,34 @@ esac
    
 
 # Get partner client's IP
-[[ ! -f ./SUT_ip.txt ]] && read -p "Input partner client's IP: " SUT_IP && echo $SUT_IP > SUT_ip.txt || SUT_IP=`cat ./SUT_ip.txt`
+[[ ! -f ./SUT_ip.txt ]] && read -p "Input partner client's IP (press Enter to use default: 192.168.1.3): " input
+[[ -z "$input" ]] && input="192.168.1.3"
+echo "$input" > SUT_ip.txt 
+SUT_IP=$(cat ./SUT_ip.txt)
+
+
+# Configure partner client's ports and firewall
+echo -e "\e[36mConfiguring partner client...\e[0m" 
+ssh -T $HOST_NAME@$SUT_IP << EOF
+    # Run iperf3 server on partner client ports
+    for port in \`seq 52001 52002\`; do iperf3 -s -D -p \$port; done
+
+    # Stop firewall service based on OS
+    if [[ -f /usr/sbin/firewalld ]]; then
+        echo '$PASSWORD' | sudo -S systemctl stop firewalld.service
+    elif [[ -f /usr/sbin/ufw ]]; then
+        echo '$PASSWORD' | sudo -S systemctl stop ufw.service
+    fi
+    exit
+EOF
+if [[ $? -ne 0 ]]; then
+  echo -e "\n\e[31mFailed to configure partner client.\e[0m"
+  exit 1
+fi 
 
 
 # Run iperf test
+echo -e "\n\e[36mStarting iperf test...\e[0m"
 for port in `seq 52001 52002`; do iperf3 -c $SUT_IP -p $port -f m -T $port & done | tee iperf3_output.txt
 
 
