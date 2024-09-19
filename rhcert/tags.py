@@ -371,7 +371,7 @@ class Constants:
     clean="clean"
     kudzu="kudzu" # still needed due to parsing fv results from RHEL5 guests
     log="log"
-    serverNVRRegex="%s[^0-9]+(?P<version>[\.0-9]+)[^0-9]+(?P<release>[0-9]+)" % rhcert
+    serverNVRRegex=r"%s[^0-9]+(?P<version>[\.0-9]+)[^0-9]+(?P<release>[0-9]+)" % rhcert
     # Bytes per
     TB = 1099511627776
     GB = 1073741824
@@ -665,8 +665,8 @@ def __getVersionRelease():
 
 class Regex: # important regex's for rhcert
     # hostname could be ip address
-    resultsFileName = "^rhcert-results-(?P<hostname>.+)-(?P<date>[0-9]+)\.xml(.gz)?$"
-    multiHostFileName = "^rhcert-multi-(?P<program>.+)-(?P<certID>.+)-(?P<date>[0-9]+)\.xml(.gz)?$"
+    resultsFileName = r"^rhcert-results-(?P<hostname>.+)-(?P<date>[0-9]+)\.xml(.gz)?$"
+    multiHostFileName = r"^rhcert-multi-(?P<program>.+)-(?P<certID>.+)-(?P<date>[0-9]+)\.xml(.gz)?$"
 
 def unitTest():
 

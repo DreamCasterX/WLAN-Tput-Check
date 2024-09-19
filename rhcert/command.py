@@ -395,11 +395,11 @@ def unitTest():
 
         # positive test: regex on multiline
         command = Command("who")
-        print("a device via who: %s" % command.getString(regex="^(?P<user>[a-z]+) (?P<device>[a-z/]+[0-9]*)[ \t]*(?P<date>2\d+-\d+-\d+).*$", regexGroup="device", singleLine=False))
+        print("a device via who: %s" % command.getString(regex=r"^(?P<user>[a-z]+) (?P<device>[a-z/]+[0-9]*)[ \t]*(?P<date>2\d+-\d+-\d+).*$", regexGroup="device", singleLine=False))
 
         #positive test: integer - simple match
         command = Command("du .")
-        print("simple du: %u" % command.getInteger(regex="\d+", singleLine=False))
+        print("simple du: %u" % command.getInteger(regex=r"\d+", singleLine=False))
 
         #positive test: integer
         command = Command("df .")
