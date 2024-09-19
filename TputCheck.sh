@@ -122,7 +122,7 @@ SUT_IP=$(cat ./SUT_ip.txt)
 
 
 # Configure partner client's ports and firewall
-echo -e "\e[36mConfiguring partner client...\e[0m" 
+echo -e "\e[33mConfiguring partner client...\e[0m" 
 ssh -T $HOST_NAME@$SUT_IP << EOF
     # Run iperf3 server on partner client ports
     for port in \`seq 52001 52002\`; do iperf3 -s -D -p \$port; done
@@ -142,11 +142,12 @@ fi
 
 
 # Run iperf test
-echo -e "\n\e[36mStarting iperf test...\e[0m"
+echo -e "\n\e[33mStarting iperf test...\e[0m"
 for port in `seq 52001 52002`; do iperf3 -c $SUT_IP -p $port -f m -T $port & done | tee iperf3_output.txt
 
 
 # Get result
 python3 rhcert/iperf3.py
+rm -fr iperf3_output.txt
 
 
